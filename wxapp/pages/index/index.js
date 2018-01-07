@@ -1,42 +1,163 @@
-import Cain from '../../utils/Cain.js'
-// 本地方式
-import LocalData from '../../utils/LocalData.js'
-
+//index.js
+//获取应用实例
+var app = getApp()
 Page({
-  data: {},
-  onReady: function (e) {
-    this.getData()
+  data: {
+    items: [],
+    hidden: false,
+    loading: false,
+    // loadmorehidden:true,
+    plain: false
   },
-  //获取数据
-  getData() {
-    // 本地方式
-    this.setData(LocalData)
-    //远程方式
-    // const self = this;
-    // wx.request({
-    // url: 'https://health.ztlife.com.cn/UnionWeChat/json/haze.liu.json',
-    //   success: function (data) {
-    //     self.setData(data.data)
-    //   }
-    // });
-  },
-  //打开/关闭手风琴项
-  toggleAccordionItem(e) {
-    let item = this.data.workList[e.currentTarget.dataset.index];
-
-    item.isShow = !item.isShow
-
-    this.setData({
-      workList: this.data.workList
+  imgDetail: function (event) {
+    var testId = event.currentTarget.dataset.testid;
+    var testIdArr = [event.currentTarget.dataset.testid];
+    console.log(testId);
+    wx.previewImage({
+      current: testId, // 当前显示图片的http链接
+      urls: testIdArr // 需要预览的图片http链接列表
     })
   },
+  onPullDownRefresh: function () {
+    var that = this;
+    mDesc = [];
+    mTimes = [];
+    mTitles = [];
+    mCurrentPage = 0
+    console.log(123);
+    that.setData({
+      items: [],
+      hidden: true,
+    });
+    requestData(that, mCurrentPage + 1);
 
-  //设置剪切板内容
-  setClipboard(e) {
-    Cain.setClipboard(e.currentTarget.dataset.content)
+    // wx.startPullDownRefresh({
+    //   success: function () {
+    //     // that.setData({
+    //     //   hidden: false,
+    //     // });
+    //     // requestData(that, mCurrentPage);
+    //   }
+    // })
   },
-  //打电话
-  callPhone() {
-    Cain.callPhone(this.data.baseInfo.mobilePhone)
+  onReachBottom: function () {
+    console.log('onLoad')
+    var that = this
+    that.setData({
+      hidden: false,
+    });
+    requestData(that, mCurrentPage + 1);
+  },
+
+  onLoad: function () {
+    console.log('onLoad')
+    var that = this
+    requestData(that, mCurrentPage + 1);
   }
+
 })
+
+/**
+ * 定义几个数组用来存取item中的数据
+ */
+var mDesc = [];
+var mTimes = [];
+var mTitles = [];
+
+var mCurrentPage = 0;
+
+// 引入utils包下的js文件
+var Constant = require('../../utils/happy.js');
+
+/**
+ * 请求数据
+ * @param that Page的对象，用来setData更新数据
+ * @param targetPage 请求的目标页码
+ */
+function requestData(that, targetPage) {
+  wx.showToast({
+    title: '加载中',
+    icon: 'loading'
+  });
+  wx.request({
+    url: Constant.GET_MEIZHI_URL,
+    data: {
+      showapi_appid: '53576',
+      showapi_sign: '7ebc023ec10447e8b556b2c3dce63d5f',
+      page: targetPage
+    },
+    header: {
+      "Content-Type": "application/json"
+    },
+    success: function (res) {
+      console.log(res);
+      if (!res.showapi_res_error) {
+        wx.request({
+          url: Constant.GET_MEIZHI_URL,
+          data: {
+            showapi_appid: '53576',
+            showapi_sign: res.showapi_res_error,
+            page: targetPage
+          },
+          header: {
+            "Content-Type": "application/json"
+          },
+          success: function (res) {
+            for (var i = 0; i < res.data.showapi_res_body.contentlist && res.data.showapi_res_body.contentlist.length; i++)
+              bindData(res.data.showapi_res_body.newslist[i]);
+
+            //将获得的各种数据写入itemList，用于setData
+            var itemList = [];
+            for (var i = 0; i < mDesc.length; i++)
+              itemList.push({ desc: mDesc[i], time: mTimes[i], title: mTitles[i] });
+
+            that.setData({
+              items: itemList,
+              hidden: true,
+              // loadmorehidden:false,
+            });
+
+            mCurrentPage = targetPage;
+
+            wx.hideToast();
+          }
+        })
+      }
+
+
+      for (var i = 0; i < res.data.showapi_res_body.contentlist.length; i++)
+        bindData(res.data.showapi_res_body.contentlist[i]);
+
+      //将获得的各种数据写入itemList，用于setData
+      var itemList = [];
+      for (var i = 0; i < mDesc.length; i++)
+        itemList.push({ desc: mDesc[i], time: mTimes[i], title: mTitles[i] });
+
+      that.setData({
+        items: itemList,
+        hidden: true,
+        // loadmorehidden:false,
+      });
+
+      mCurrentPage = targetPage;
+
+      wx.hideToast();
+      console.log(that.data.items);
+    }
+  });
+}
+
+/**
+ * 绑定接口中返回的数据
+ * @param itemData Gank.io返回的content;
+ */
+function bindData(itemData) {
+
+  var desc = itemData.img;
+  var title = itemData.title;
+  var times = itemData.ct.split('.')[0];
+
+  mDesc.push(desc);
+  mTimes.push(times);
+  mTitles.push(title);
+}

@@ -1,6 +1,6 @@
 import Cain from '../../utils/Cain.js'
 // 本地方式
-import LocalData from '../../utils/LocalData.js'
+// import LocalData from '../../utils/LocalData.js'
 
 Page({
   data: {},

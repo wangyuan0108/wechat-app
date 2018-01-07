@@ -9,7 +9,28 @@ Page({
     // loadmorehidden:true,
     plain: false
   },
+  onPullDownRefresh: function () {
+    var that = this;
+    mUrl = [];
+    mDesc = [];
+    mWho = [];
+    mTimes = [];
+    mTitles = [];
+    that.setData({
+      items: [],
+      hidden: true,
+    });
+    requestData(that, mCurrentPage);
 
+    // wx.startPullDownRefresh({
+    //   success: function () {
+    //     // that.setData({
+    //     //   hidden: false,
+    //     // });
+    //     // requestData(that, mCurrentPage);
+    //   }
+    // })
+  },
   onItemClick: function (event) {
     var targetUrl = "/pages/image/image";
     if (event.currentTarget.dataset.url != null)
@@ -147,5 +168,5 @@ function bindData(itemData) {
   mDesc.push(desc);
   mWho.push(who);
   mTimes.push(times);
-  mTitles.push("publish by：" + "@" + who + " —— " + times);
+  mTitles.push("@" + who + " —— " + times);
 }

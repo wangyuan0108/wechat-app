@@ -1,10 +1,14 @@
 {
   "pages": [
     "pages/index/index",
-    "pages/meizi/meizi",
+    "pages/meizhi/meizhi",
     "pages/work/work",
+    "pages/image/image",
     "pages/experience/experience"
   ],
+  "window": {
+    "enablePullDownRefresh": true
+  },
   "tabBar": {
     "color": "#7A7E83",
     "selectedColor": "#1296db",
@@ -13,27 +17,15 @@
     "list": [
       {
         "pagePath": "pages/index/index",
-        "iconPath": "img/my.png",
-        "selectedIconPath": "img/my_selected.png",
-        "text": "基本信息"
+        "iconPath": "img/appIcon01.png",
+        "selectedIconPath": "img/appIcon01-active.png",
+        "text": "每日一笑"
       },
       {
-        "pagePath": "pages/meizi/meizi",
-        "iconPath": "img/jineng.png",
-        "selectedIconPath": "img/my_jineng.png",
-        "text": "个人项目"
-      },
-      {
-        "pagePath": "pages/work/work",
-        "iconPath": "img/h.png",
-        "selectedIconPath": "img/h_selected.png",
-        "text": "项目经验"
-      },
-      {
-        "pagePath": "pages/experience/experience",
-        "iconPath": "img/work.png",
-        "selectedIconPath": "img/work_selected.png",
-        "text": "工作经历"
+        "pagePath": "pages/meizhi/meizhi",
+        "iconPath": "img/appIcon02.png",
+        "selectedIconPath": "img/appIcon02-active.png",
+        "text": "妹纸图"
       }
     ]
   }
